@@ -1,0 +1,85 @@
+{
+  "name": "enmaca/boui-font-manager",
+  "description": "---",
+  "license": "Private",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Enrique Martinez",
+      "email": "enmaca@hotmail.com",
+      "role": "Technical Lead & Developer"
+    }
+  ],
+  "autoload": {
+    "files": [
+      "src/Functions.php"
+    ],
+    "psr-4": {
+      "Enmaca\\Backoffice\\Typography\\": "src/",
+      "Enmaca\\Backoffice\\Typography\\Tests\\": "tests/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests",
+      "Database\\": "database"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Enmaca\\Backoffice\\Typography\\TypographyServiceProvider.php"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": "^8.2 || ^8.3",
+    "livewire/livewire": "^3.3",
+    "illuminate/console": "*",
+    "illuminate/contracts": "*",
+    "illuminate/view": "*",
+    "illuminate/database": "*",
+    "symfony/dom-crawler": "^7.0",
+    "symfony/css-selector": "^7.0",
+    "laravel/framework": "^10.35|^11.0",
+    "ext-pdo": "*",
+    "laravel/prompts": "^0.1.15",
+    "doctrine/dbal": "^3.8",
+    "opis/closure": "^3.6",
+    "guzzlehttp/guzzle": "^7.4",
+    "uxmaltech/core": "*",
+    "uxmaltech/backoffice-ui": "dev-ADR-001",
+    "uxmaltech/backend-cbq": "*",
+    "dompdf/php-font-lib": "^1.0"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^8.19|^9.0",
+    "phpunit/phpunit": "^10.5|^11.0",
+    "laravel/pint": "^1.13"
+  },
+  "repositories": {
+    "uxmaltech-core": {
+      "type": "path",
+      "url": "../../uxmaltech/core",
+      "options": {
+        "symlink": true
+      }
+    },
+    "uxmaltech-backoffice-ui": {
+      "type": "path",
+      "url": "../../uxmaltech/backoffice-ui",
+      "options": {
+        "symlink": true
+      }
+    },
+    "uxmaltech-backend-cbq": {
+      "type": "path",
+      "url": "../../uxmaltech/backend-cbq",
+      "options": {
+        "symlink": true
+      }
+    }
+  }
+}
