@@ -3,19 +3,14 @@
 namespace Enmaca\Backoffice\Typography\App;
 
 use Enmaca\Backoffice\Typography\TypographyResourceManager;
+use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\App;
 use Random\RandomException;
 use Uxmal\Backoffice\Actions\Dispatch;
-use Uxmal\Backoffice\Actions\Javascript as JavascriptAction;
-use Uxmal\Backoffice\Components\Form;
 use Uxmal\Backoffice\Components\Html;
 use Uxmal\Backoffice\Components\UI;
 use Uxmal\Backoffice\Exceptions\BackofficeUiException;
-use Uxmal\Backoffice\Form\Input\Filepond\Options as FilepondOptions;
-use Uxmal\Backoffice\Form\Input\Filepond\ServerOptions;
-use Uxmal\Backoffice\Helpers\NamedRoute;
-use Uxmal\Backoffice\Helpers\NamedRoute;
 use Uxmal\Backoffice\Helpers\NamedRoute as NamedRouteAction;
 use Uxmal\Backoffice\JavaScriptEvents\MouseEventsEnum;
 use Uxmal\Backoffice\Support\Enums\BSStylesEnum;
@@ -72,7 +67,7 @@ class FontManager
     /**
      * @throws RandomException
      * @throws BackofficeUiException
-     * @throws \Exception
+     * @throws Exception
      */
     private function buildFontManager(): string
     {
