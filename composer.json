@@ -1,8 +1,7 @@
 {
   "name": "enmaca/boui-font-manager",
-  "description": "---",
+  "description": "uxmaltech/backoffice-ui Compatible App to easily manage and edit your entire font library, track multiple versions, and create typography categories for your projects.",
   "license": "Private",
-  "version": "1.0.0",
   "authors": [
     {
       "name": "Enrique Martinez",
@@ -15,8 +14,8 @@
       "src/Functions.php"
     ],
     "psr-4": {
-      "Enmaca\\Backoffice\\Typography\\": "src/",
-      "Enmaca\\Backoffice\\Typography\\Tests\\": "tests/"
+      "Enmaca\\Backoffice\\FontManager\\": "src/",
+      "Enmaca\\Backoffice\\FontManager\\Tests\\": "tests/"
     }
   },
   "autoload-dev": {
@@ -28,7 +27,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Enmaca\\Backoffice\\Typography\\TypographyServiceProvider.php"
+        "Enmaca\\Backoffice\\FontManager\\FontManagerServiceProvider"
       ]
     }
   },

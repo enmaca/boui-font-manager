@@ -1,6 +1,6 @@
 <?php
 
-namespace Enmaca\Backoffice\Typography\App;
+namespace Enmaca\Backoffice\FontManager\App\Catalog;
 
 use Uxmal\Backoffice\Actions\Javascript as JavascriptAction;
 use Uxmal\Backoffice\Actions\SubmitForm;
@@ -14,9 +14,7 @@ use Uxmal\Backoffice\Support\Enums\ButtonTypeEnum;
 
 class AddGoogleTypographyModal
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public static function getContent(): string
     {
