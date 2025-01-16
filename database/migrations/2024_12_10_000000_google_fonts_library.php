@@ -8,23 +8,54 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('google_fonts_library', function (Blueprint $table) {
+        Schema::create('google_font_families', function (Blueprint $table) {
             $table->id();
             $table->string('family');
-            $table->json('variants');
             $table->json('subsets');
             $table->string('category');
-            $table->json('tags')->nullable();
-            $table->boolean('variable')->default(false);
+            $table->string('version')->nullable();
             $table->date('last_modified');
-            $table->boolean('downloaded')->default(false);
-            $table->string('location_uri')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('google_font_variants', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::create('google_font_files', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('google_font_family_id')->constrained('google_font_families');
+            $table->foreignId('google_font_variant_id')->constrained('google_font_variants');
+            $table->boolean('downloaded')->default(false);
+            $table->longText('uri');
+            $table->timestamps();
+        });
+
+        Schema::create('google_font_tags', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::create('google_font_family_tags', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('google_font_family_id')->constrained('google_font_families');
+            $table->foreignId('google_font_tag_id')->constrained('google_font_tags');
+            $table->timestamps();
+        });
+
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('google_fonts_library');
+
+        Schema::dropIfExists('google_font_family_tags');
+        Schema::dropIfExists('google_font_files');
+        Schema::dropIfExists('google_font_tags');
+        Schema::dropIfExists('google_font_variants');
+        Schema::dropIfExists('google_font_families');
+
     }
 };

@@ -32,6 +32,7 @@ class FontManagerServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \Enmaca\Backoffice\FontManager\Console\BuildExternalDependenciesConsole::class,
+                \Enmaca\Backoffice\FontManager\Console\UpdateGoogleFontsDatabaseConsole::class,
             ]);
         }
 
