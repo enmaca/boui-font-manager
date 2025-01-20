@@ -33,7 +33,6 @@ return new class extends Migration
 
         Schema::create('font_files', function (Blueprint $table) {
             $table->id();
-            //$table->foreignId('font_variant_id')->constrained('font_variants')->cascadeOnDelete();
             $table->string('font_origin_type')->index()->nullable();
             $table->string('font_origin_id')->index()->nullable();
             $table->string('version')->default(1);
