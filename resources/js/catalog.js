@@ -4,8 +4,22 @@
  */
 const bouiFontManagerCatalog = (boui) => {
 
+    boui.on('ui-tab.boui.shown', (event) => {
+        console.warn('Tab shown:', event);
+    });
+
+    boui.on('click.download.google-font.boui.action', (event) => {
+        const fontFileId = event.element.getAttribute('data-google-font-files-id');
+        boui.cbq('cmd.font-manager.google-font.download.v1', {}, {'font_file_id': fontFileId}).then(r => {
+            boui.warn('Downloaded Google Font:', r);
+            boui.get('content.googleFontList').reload();
+        });
+        console.warn('Download Google Font:', fontFileId);
+    });
+
     boui.on('ui-gridjs.boui.ready', (event) => {
         switch (event.name) {
+            case 'googleFontList':
             case 'typography':
                 const divFontPreviewEl = event.element.querySelectorAll('.font-preview');
                 divFontPreviewEl.forEach((el) => {
@@ -40,6 +54,7 @@ const bouiFontManagerCatalog = (boui) => {
 
     boui.on('ui-modal.boui.hidden', (event) => {
         switch (event.name) {
+            case 'addGoogleTypography':
             case 'addTypography':
                 boui.get('content.typography').reload();
                 boui.get('forms.uploadTypography').reset();

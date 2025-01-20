@@ -3,8 +3,11 @@
 namespace Enmaca\Backoffice\FontManager\Controllers;
 
 use Enmaca\Backoffice\FontManager\Models\FontFiles;
+use Enmaca\Backoffice\FontManager\Models\FontVariant;
+use Enmaca\Backoffice\FontManager\Models\GoogleFontFiles;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class FontController
@@ -75,11 +78,21 @@ class FontController
                     }
                 }
 
-                FontFiles::where(['font_variant_id' => $fontFileRecord->font_variant_id])->update(['default' => false]);
+                FontFiles::where([
+                    'font_origin_type' => $fontFileRecord->font_origin_type,
+                    'font_origin_id' => $fontFileRecord->font_origin_id
+                ])->update(['default' => false]);
+
+                $version = match ($fontFileRecord->font_origin_type) {
+                    GoogleFontFiles::class => $fontFileRecord->font_origin->version . '.' . Carbon::now()->format('YmdHis'),
+                    FontVariant::class => FontFiles::where(['font_variant_id' => $fontFileRecord->font_origin_id])->max('version') + 1,
+                    default => 1,
+                };
 
                 FontFiles::create([
-                    'font_variant_id' => $fontFileRecord->font_variant_id,
-                    'version' => FontFiles::where(['font_variant_id' => $fontFileRecord->font_variant_id])->max('version') + 1,
+                    'font_origin_type' => $fontFileRecord->font_origin_type,
+                    'font_origin_id' => $fontFileRecord->font_origin_id,
+                    'version' => $version,
                     'version_comments' => $data['comments'] ?? null,
                     'default' => true,
                     'original_name' => $fontFileRecord->original_name,

@@ -7,7 +7,7 @@ use Exception;
 use Uxmal\Backend\Attributes\RegisterCommand;
 use Uxmal\Backend\Command\CommandBase;
 
-#[RegisterCommand('/v1/pd/typography/file/revert', 'delete', 'cmd.font-manager.typography.file.revert.v1')]
+#[RegisterCommand('/v1/font-manager/typography/file/revert', 'delete', 'cmd.font-manager.typography.file.revert.v1')]
 class Revert extends CommandBase
 {
     public array $payloadValidator = [

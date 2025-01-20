@@ -51,7 +51,8 @@
     "uxmaltech/core": "*",
     "uxmaltech/backoffice-ui": "dev-ADR-001",
     "uxmaltech/backend-cbq": "*",
-    "dompdf/php-font-lib": "^1.0"
+    "dompdf/php-font-lib": "^1.0",
+    "ext-fileinfo": "*"
   },
   "require-dev": {
     "orchestra/testbench": "^8.19|^9.0",

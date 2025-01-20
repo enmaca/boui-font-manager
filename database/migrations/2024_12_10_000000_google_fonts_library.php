@@ -28,8 +28,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('google_font_family_id')->constrained('google_font_families');
             $table->foreignId('google_font_variant_id')->constrained('google_font_variants');
+            $table->longText('remote_uri')->nullable();
             $table->boolean('downloaded')->default(false);
-            $table->longText('uri');
+            $table->longText('local_uri')->nullable();
             $table->timestamps();
         });
 

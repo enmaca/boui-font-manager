@@ -2,15 +2,15 @@
 
 namespace Enmaca\Backoffice\FontManager\App\Catalog;
 
-use Uxmal\Backoffice\Actions\Javascript as JavascriptAction;
-use Uxmal\Backoffice\Actions\SubmitForm;
-use Uxmal\Backoffice\Components\Form;
 use Uxmal\Backoffice\Components\Html;
 use Uxmal\Backoffice\Components\UI;
-use Uxmal\Backoffice\JavaScriptEvents\MouseEventsEnum;
+use Uxmal\Backoffice\Helpers\NamedRoute as NamedRouteAction;
 use Uxmal\Backoffice\Support\Enums\BSStylesEnum;
 use Uxmal\Backoffice\Support\Enums\ButtonSizeEnum;
 use Uxmal\Backoffice\Support\Enums\ButtonTypeEnum;
+use Uxmal\Backoffice\UI\GridJS\Column as GridColumn;
+use Uxmal\Backoffice\UI\GridJS\Pagination as GridPagination;
+use Uxmal\Backoffice\UI\Modal;
 
 class AddGoogleTypographyModal
 {
@@ -19,40 +19,24 @@ class AddGoogleTypographyModal
     public static function getContent(): string
     {
         return UI::modal('addGoogleTypography')
-            ->title('Nueva Tipografía')
+            ->modalOptions(Modal::SIZE_XL | Modal::CENTERED)
+            ->title('Importar tipografía de Google')
             ->body(
-                Form::make(name: 'addGoogleTypography', action: 'cmd.pd.product.create.v1')
-                    ->autocomplete(false)
-                    ->content(
-                        html::divRow()
-                            ->class('g-3')
-                            ->content([
-                                html::div()
-                                    ->class('col-12')
-                                    ->content(
-                                        Form::inputGroup('name')
-                                            ->label('Nombre de la tipografía')
-                                            ->required()
-                                    ),
-                                html::div()
-                                    ->class('col-12')
-                                    ->content(Form::inputGroup('width_mm')
-                                        ->suffix('mm')
-                                        ->label('Ancho (mm)')
-                                        ->placeholder('210')
-                                        ->required()
-                                    ),
-                                html::div()
-                                    ->class('col-12')
-                                    ->content(Form::inputGroup('height_mm')
-                                        ->suffix('mm')
-                                        ->label('Largo (mm)')
-                                        ->placeholder('297')
-                                        ->required()
-                                    ),
-                            ])
+                UI::gridJS('googleFontList')
+                    ->queryEndPoint(
+                        NamedRouteAction::make('qry.font-manager.google-fonts.get.v1')
                     )
-                    ->uxActionOnSuccessSubmit(JavascriptAction::call('onSuccessCreateNewDesign'))
+                    ->setColumns([
+                        GridColumn::html('Tipografía', 'family')
+                            ->resizable(true)
+                            ->sort(),
+                        GridColumn::html('Previsualización', 'preview')
+                            ->sort(),
+                        GridColumn::html('Version', 'version')
+                            ->sort(),
+                        GridColumn::action(),
+                    ])
+                ->setPagination(GridPagination::create(5))
             )
             ->footer([
                 Html::button('Close')
@@ -64,7 +48,7 @@ class AddGoogleTypographyModal
                     ->attribute('type', 'submit')
                     ->class('btn btn-primary')
                     ->content('Create')
-                    ->uxActionOnJSEvent(MouseEventsEnum::CLICK, SubmitForm::target('addGoogleTypography')),
+                    //->uxActionOnJSEvent(MouseEventsEnum::CLICK, SubmitForm::target('addGoogleTypography')),
             ])
             ->trigger(
                 Html::button('addGoogleTypography')

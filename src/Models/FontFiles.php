@@ -12,7 +12,8 @@ class FontFiles extends Model
     protected $table = 'font_files';
 
     protected $fillable = [
-        'font_variant_id',
+        'font_origin_type',
+        'font_origin_id',
         'version',
         'version_comments',
         'default',
@@ -33,9 +34,9 @@ class FontFiles extends Model
         })->with('variant.font');
     }
 
-    public function variant(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function font_origin(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
-        return $this->belongsTo(FontVariant::class, 'font_variant_id');
+        return $this->morphTo('font_origin', 'font_origin_type', 'font_origin_id');
     }
 
     public function scopeDefault($query)

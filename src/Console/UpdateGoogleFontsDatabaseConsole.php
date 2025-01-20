@@ -55,6 +55,7 @@ class UpdateGoogleFontsDatabaseConsole extends Command
                     'subsets' => json_encode($font['subsets']),
                     'category' => $font['category'],
                     'last_modified' => $font['lastModified'],
+                    'version' => $font['version'],  //TODO: HANDLE VERSION CHANGES ON ALREADY DOWNLOADED FONT
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]
@@ -69,10 +70,11 @@ class UpdateGoogleFontsDatabaseConsole extends Command
                     ]
                 )->first();
 
+                //TODO: HANDLE VERSION CHANGES ON ALREADY DOWNLOADED FONT
                 GoogleFontFiles::updateOrInsert(
                     ['google_font_family_id' => $font_family_data->id, 'google_font_variant_id' => $font_variant_data->id],
                     [
-                        'uri' => $font['files'][$variant],
+                        'remote_uri' => $font['files'][$variant],
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]

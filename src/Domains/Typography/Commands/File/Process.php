@@ -2,21 +2,22 @@
 
 namespace Enmaca\Backoffice\FontManager\Domains\Typography\Commands\File;
 
+use Enmaca\Backoffice\FontManager\Domains\Typography\Rules\TypographyFiles;
 use Enmaca\Backoffice\FontManager\Exceptions\FontManagerException;
 use Enmaca\Backoffice\FontManager\Models\Font;
+use Enmaca\Backoffice\FontManager\Models\FontFiles;
+use Enmaca\Backoffice\FontManager\Models\FontVariant;
 use Exception;
-use Illuminate\Support\Str;
 use Uxmal\Backend\Attributes\RegisterCommand;
 use Uxmal\Backend\Command\CommandBase;
 use Uxmal\Backend\Command\Traits\CommandStandardResponse;
 
-#[RegisterCommand('/v1/pd/typography/file/process', 'post', 'cmd.font-manager.typography.file.process.v1')]
+#[RegisterCommand('/v1/font-manager/typography/file/process', 'post', 'cmd.font-manager.typography.file.process.v1')]
 class Process extends CommandBase
 {
     use CommandStandardResponse;
 
-    public array $payloadValidator = [
-    ];
+    public array $payloadValidator = [];
 
     /**
      * Execute the job.
@@ -51,23 +52,23 @@ class Process extends CommandBase
         $font->close();
 
         $fontModel = Font::where('name', $name)->first();
-        if (! $fontModel) {
+        if (!$fontModel) {
             $fontModel = new Font;
             $fontModel->name = $name;
             $fontModel->save();
         }
 
-        $fontVariant = $fontModel->variants()
+        $fontVariant = FontVariant::where('font_id', $fontModel->id)
             ->where('sub_family_id', $subFamilyId)
             ->where('full_name', $fullName)
             ->where('version', $version)
             ->where('weight', $weight)
             ->where('post_script_name', $postScriptName)
-
             ->first();
 
-        if (! $fontVariant) {
-            $fontVariant = $fontModel->variants()->create([
+        if (!$fontVariant) {
+            $fontVariant = FontVariant::create([
+                'font_id' => $fontModel->id,
                 'sub_family' => $subFamily,
                 'sub_family_id' => $subFamilyId,
                 'full_name' => $fullName,
@@ -78,25 +79,19 @@ class Process extends CommandBase
                 'type' => $type,
             ]);
 
-            $uuid = (string) Str::uuid();
 
-            $firstThreeUUID = str_split(substr($uuid, 0, 3));
+            $destinationInfo = TypographyFiles::getDestinationPath($extension);
+            $file_uri = TypographyFiles::moveFile($file, $destinationInfo['path'], $destinationInfo['local_file']);
 
-            $restOfStringUUID = substr($uuid, 3);
-
-            $local_file = $restOfStringUUID.'.'.$extension;
-
-            $destinationPath = storage_path('app/fonts/'.implode('/', $firstThreeUUID));
-
-            $file->move($destinationPath, $local_file);
-
-            $fontVariant->file()->create([
+            FontFiles::create([
+                'font_origin_type' => FontVariant::class,
+                'font_origin_id' => $fontVariant->id,
                 'default' => true,
                 'original_name' => $originalName,
                 'extension' => $extension,
                 'mime_type' => $mimeType,
                 'size' => $size,
-                'uri' => 'file://'.$destinationPath.'/'.$local_file,
+                'uri' => $file_uri,
                 'local' => true,
             ]);
         }

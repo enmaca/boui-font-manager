@@ -33,8 +33,8 @@ class FontVariant extends Model
         return $this->belongsTo(Font::class);
     }
 
-    public function file(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function file(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        return $this->hasOne(FontFiles::class)->default();
+        return $this->morphOne(FontFiles::class, 'font_origin');
     }
 }
