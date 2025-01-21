@@ -3,6 +3,8 @@
 namespace Enmaca\Backoffice\FontManager\App\VersionManager;
 
 use Enmaca\Backoffice\FontManager\App\ContentInterface;
+use Enmaca\Backoffice\FontManager\Models\FontVariant;
+use Enmaca\Backoffice\FontManager\Models\GoogleFontFiles;
 use Uxmal\Backoffice\Actions\Dispatch;
 use Uxmal\Backoffice\Components\Html;
 use Uxmal\Backoffice\Components\UI;
@@ -21,22 +23,44 @@ class Content implements ContentInterface
     /**
      * @throws BackofficeUiException
      */
-    public static function getMainContent(string|int|null $id = null): array
+    public static function getMainContent(string|null $type = null, string|int|null $id = null): array
     {
-        return [
-            self::buildMainContent($id),
-        ];
+        if( $type === null || $id === null ){
+            throw new BackofficeUiException('Type and ID are required');
+        }
+
+        return self::buildMainContent($type, $id);
     }
 
     /**
      * @throws BackofficeUiException
      */
-    private static function buildMainContent(string|int $id): HtmlElement
+    private static function buildMainContent(string $type, string|int $id) : array
     {
 
-        return UI::gridJS('versions')
+        if( !$type || !$id ){
+            throw new BackofficeUiException('Type and ID are required');
+        }
+
+        $name = match ($type){
+            'font-variant' => FontVariant::find(FontVariant::normalizeId($id))->font->name. ' ('.FontVariant::find(FontVariant::normalizeId($id))->sub_family.')',
+            'google-fonts' => GoogleFontFiles::find(GoogleFontFiles::normalizeId($id))->family->family.' ('.GoogleFontFiles::find(GoogleFontFiles::normalizeId($id))->variant->name.')',
+            default => null
+        };
+
+
+        return [
+            Html::tag('div')
+                ->content(
+                    Html::tag('h3')
+                        ->content($name)
+                ),
+            UI::gridJS('versions')
             ->queryEndPoint(
-                NamedRouteAction::make('qry.font-manager.versions.get.v1', ['id' => $id])
+                NamedRouteAction::make('qry.font-manager.versions.get.v1', [
+                    'type' => $type,
+                    'id' => $id
+                ])
             )
             ->setHeaderContent(
                 Html::div()
@@ -64,6 +88,7 @@ class Content implements ContentInterface
             ])
             ->setPagination(GridPagination::create(5))
             ->strippedRows()
-            ->hoverRows();
+            ->hoverRows()
+            ];
     }
 }

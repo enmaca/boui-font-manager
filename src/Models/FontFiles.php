@@ -26,14 +26,6 @@ class FontFiles extends Model
         'local',
     ];
 
-    public function scopeFontId($query, $fontId)
-    {
-        $fontId = Font::normalizeId($fontId);
-        return $query->whereHas('variant', function ($q) use ($fontId) {
-            $q->where('font_id', $fontId);
-        })->with('variant.font');
-    }
-
     public function font_origin(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo('font_origin', 'font_origin_type', 'font_origin_id');

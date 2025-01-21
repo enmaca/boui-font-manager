@@ -4,6 +4,7 @@ namespace Enmaca\Backoffice\FontManager\Domains\Typography\Queries;
 
 use Enmaca\Backoffice\FontManager\Models\Font;
 use Enmaca\Backoffice\FontManager\Models\FontFiles;
+use Enmaca\Backoffice\FontManager\Models\FontVariant;
 use Enmaca\Backoffice\FontManager\Models\GoogleFontFiles;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,10 +33,11 @@ class Get
     public function __invoke(Request $request): JsonResponse
     {
 
-        $versionPath = $request->get('versionPath', '/font-manager/versions/');
+        $versionPath = rtrim($request->get('versionPath', '/font-manager/versions/'), '/');
+
 
         $this->setQueryBuilder(
-            FontFiles::with(['font_origin'])
+            FontFiles::with(['font_origin'])->where('default', 1)
         )
             ->setQueryColumns([
                 'id',
@@ -56,18 +58,33 @@ class Get
                     return $row->hash;
                 },
                 'name' => function ($row) {
-                    return match ($row->font_origin_type) {
-                        GoogleFontFiles::class => $row->font_origin->family->family. ' (' . $row->font_origin->variant->name.')',
+                    $family = match ($row->font_origin_type) {
+                        GoogleFontFiles::class => $row->font_origin->family->family,
+                        FontVariant::class => $row->font_origin->font->name,
                         default => 'unknown',
                     };
+                    $variant = match ($row->font_origin_type) {
+                        GoogleFontFiles::class => $row->font_origin->variant->name,
+                        FontVariant::class => $row->font_origin->sub_family,
+                        default => 'unknown',
+                    };
+
+                    return $family.' ('.$variant.')';
                 },
                 'preview' => function ($row) {
 
-                    $fontUrl = match ($row->font_origin_type) {
-                        GoogleFontFiles::class => $row->url(),
-                        default => '',
+                    $fontUrl = $row->url();
+                    $family = match ($row->font_origin_type) {
+                        GoogleFontFiles::class => $row->font_origin->family->family,
+                        FontVariant::class => $row->font_origin->font->name,
+                        default => 'unknown',
                     };
-                    $fontName = Str::camel($row->font_origin->family->family.'_'.$row->font_origin->variant->name);
+                    $variant = match ($row->font_origin_type) {
+                        GoogleFontFiles::class => $row->font_origin->variant->name,
+                        FontVariant::class => $row->font_origin->sub_family,
+                        default => 'unknown',
+                    };
+                    $fontName = Str::camel($family.'_'.$variant.'_'.$row->version);
 
                     return (string) Html::div()
                         ->class('font-preview')
@@ -81,6 +98,11 @@ class Get
                     return 'number: '.$row->version.'<br> comments: '.($row->version == 1 ? ' original font' : $row->version_comments).'<br>created on: '.$row->created_at;
                 },
                 'action' => function ($row) use ($versionPath) {
+                    $path =  match ($row->font_origin_type) {
+                        GoogleFontFiles::class => $versionPath.'/google-fonts/'.GoogleFontFiles::normalizeId($row->font_origin_id),
+                        FontVariant::class => $versionPath.'/font-variant/'.FontVariant::normalizeId($row->font_origin->hash),
+                        default => '#',
+                    };
                     return (string) Html::divFlex()
                         ->justify(DivFlexJustifyContentEnum::Center)
                         ->content([
@@ -95,7 +117,7 @@ class Get
                                 ->btnSize(ButtonSizeEnum::Small)
                                 ->content(UI::icon()->ri('edit-line')),
                             Html::button('ViewVersions-'.$row->hash)
-                                ->href($versionPath.$row->hash)
+                                ->href($path)
                                 ->style('margin-right : 10px')
                                 ->class('btnViewVersions')
                                 ->uxmalIgnore()

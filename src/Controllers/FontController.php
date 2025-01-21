@@ -23,7 +23,7 @@ class FontController
                     'Content-Type' => $fontFileRecord->mime_type,
                     'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
                     'Pragma' => 'no-cache',
-                    'Content-Disposition' => 'inline; filename="'.$fontFileRecord->original_name.'"',
+                    'Content-Disposition' => 'inline; filename="' . $fontFileRecord->original_name . '"',
                 ]);
             case 'http':
             case 'https':
@@ -50,30 +50,30 @@ class FontController
 
                 $fileData = base64_decode($data['fontInBase64']);
 
-                $uuid = (string) Str::uuid();
+                $uuid = (string)Str::uuid();
 
                 $firstThreeUUID = str_split(substr($uuid, 0, 3));
 
                 $restOfStringUUID = substr($uuid, 3);
 
-                $destinationPath = storage_path('app/fonts/'.implode('/', $firstThreeUUID));
+                $destinationPath = storage_path('app/fonts/' . implode('/', $firstThreeUUID));
 
-                $local_file = $restOfStringUUID.'.otf';
+                $local_file = $restOfStringUUID . '.otf';
 
-                $uri = 'file://'.$destinationPath.'/'.$local_file;
+                $uri = 'file://' . $destinationPath . '/' . $local_file;
 
                 $tmpFile = tempnam(sys_get_temp_dir(), 'font');
 
-                if (! file_put_contents($tmpFile, $fileData)) {
+                if (!file_put_contents($tmpFile, $fileData)) {
                     throw new \Exception('Error saving file', 500);
                 }
 
-                if (! is_dir($destinationPath)) {
-                    if (! mkdir($destinationPath, 0777, true)) {
+                if (!is_dir($destinationPath)) {
+                    if (!mkdir($destinationPath, 0777, true)) {
                         throw new \Exception('Error creating directory', 500);
                     }
 
-                    if (! rename($tmpFile, $destinationPath.'/'.$local_file)) {
+                    if (!rename($tmpFile, $destinationPath . '/' . $local_file)) {
                         throw new \Exception('Error moving file', 500);
                     }
                 }
@@ -83,11 +83,10 @@ class FontController
                     'font_origin_id' => $fontFileRecord->font_origin_id
                 ])->update(['default' => false]);
 
-                $version = match ($fontFileRecord->font_origin_type) {
-                    GoogleFontFiles::class => $fontFileRecord->font_origin->version . '.' . Carbon::now()->format('YmdHis'),
-                    FontVariant::class => FontFiles::where(['font_variant_id' => $fontFileRecord->font_origin_id])->max('version') + 1,
-                    default => 1,
-                };
+                $version = FontFiles::where([
+                        'font_origin_type' => $fontFileRecord->font_origin_type,
+                        'font_origin_id' => $fontFileRecord->font_origin_id
+                    ])->max('version') + 1;
 
                 FontFiles::create([
                     'font_origin_type' => $fontFileRecord->font_origin_type,

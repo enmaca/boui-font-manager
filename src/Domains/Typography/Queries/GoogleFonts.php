@@ -34,9 +34,6 @@ class GoogleFonts
     public function __invoke(Request $request): JsonResponse
     {
 
-        $versionPath = $request->get('versionPath', '/font-manager/versions/');
-
-
         $searchString = $request->get('search');
         if ($searchString == null || $searchString == '') {
             $searchItems = [];

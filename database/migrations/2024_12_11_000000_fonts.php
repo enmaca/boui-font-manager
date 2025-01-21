@@ -35,7 +35,7 @@ return new class extends Migration
             $table->id();
             $table->string('font_origin_type')->index()->nullable();
             $table->string('font_origin_id')->index()->nullable();
-            $table->string('version')->default(1);
+            $table->integer('version')->default(1);
             $table->string('version_comments')->nullable();
             $table->boolean('default')->default(false);
             $table->string('original_name')->index()->nullable();
