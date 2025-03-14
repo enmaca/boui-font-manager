@@ -1,6 +1,6 @@
 <?php
 
-namespace Enmaca\Backoffice\FontManager\App;
+namespace Enmaca\Backoffice\FontManager\UI;
 
 interface ContentInterface
 {

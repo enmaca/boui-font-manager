@@ -1,6 +1,6 @@
 <?php
 
-namespace Enmaca\Backoffice\FontManager\App\Catalog;
+namespace Enmaca\Backoffice\FontManager\UI\Catalog;
 
 use Uxmal\Backoffice\Components\Html;
 use Uxmal\Backoffice\Components\UI;

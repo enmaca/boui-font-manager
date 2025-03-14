@@ -1,8 +1,8 @@
 <?php
 
-namespace Enmaca\Backoffice\FontManager\App\Catalog;
+namespace Enmaca\Backoffice\FontManager\UI\Catalog;
 
-use Enmaca\Backoffice\FontManager\App\ContentInterface;
+use Enmaca\Backoffice\FontManager\UI\ContentInterface;
 use Exception;
 use Random\RandomException;
 use Uxmal\Backoffice\Actions\Dispatch;

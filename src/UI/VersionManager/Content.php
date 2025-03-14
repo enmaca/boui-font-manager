@@ -1,8 +1,8 @@
 <?php
 
-namespace Enmaca\Backoffice\FontManager\App\VersionManager;
+namespace Enmaca\Backoffice\FontManager\UI\VersionManager;
 
-use Enmaca\Backoffice\FontManager\App\ContentInterface;
+use Enmaca\Backoffice\FontManager\UI\ContentInterface;
 use Enmaca\Backoffice\FontManager\Models\FontVariant;
 use Enmaca\Backoffice\FontManager\Models\GoogleFontFiles;
 use Uxmal\Backoffice\Actions\Dispatch;
