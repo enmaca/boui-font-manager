@@ -130,7 +130,7 @@ class GoogleFonts
                 'version' => function ($row) {
                     return $row->version;
                 },
-                'action' => function ($row) use ($versionPath) {
+                'action' => function ($row) {
                     $fontsDownloaded = 0;
                     $fontsCount = count($row->files);
                     foreach ($row->files as $file) {
