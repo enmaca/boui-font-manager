@@ -33,10 +33,9 @@ export default defineConfig({
         fs: {
             // Permite servir archivos desde rutas adicionales dentro del contenedor
             allow: [
-                '/app',
-                '/app/resources',
-                path.resolve(__dirname, 'vendor/uxmaltech/backoffice-ui/dist'),
-                path.resolve(__dirname, 'resources'),
+                path.resolve(__dirname, '/app/resources'),
+                path.resolve(__dirname, '/app/vendor/uxmaltech/backoffice-ui/resources'),
+                path.resolve(__dirname, '/app/vendor/uxmaltech/backoffice-ui/node_modules'),
             ],
         },
     },

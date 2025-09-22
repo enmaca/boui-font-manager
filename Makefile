@@ -13,6 +13,9 @@ PKG_PATH_ABS      := $(abspath $(PKG_PATH))
 DEVAPP_ABS        := $(abspath $(APP_DIR))
 DC                 := docker compose -f ./docker-compose.yml
 
+# Composer cache directory on host (override with: make COMPOSER_CACHE=...)
+COMPOSER_CACHE     ?= $(HOME)/.cache/composer
+
 # Carga ./.env si existe (variables disponibles en Make)
 ifneq (,$(wildcard ./.env))
 	include ./.env
@@ -41,7 +44,10 @@ devapp:
 	@if [ ! -d "$(APP_DIR)" ] || [ ! -f "$(APP_DIR)/artisan" ]; then \
 	  echo "📦 Creating Laravel app in $(APP_DIR)"; \
 	  mkdir -p $(APP_DIR); \
+	  mkdir -p $(COMPOSER_CACHE); \
 	  docker run --rm -u $$(id -u):$$(id -g) \
+	    -e COMPOSER_CACHE_DIR="/tmp/composer-cache" \
+	    -v "$(COMPOSER_CACHE)":/tmp/composer-cache \
 	    -v $(PWD)/$(APP_DIR):/app -w /app $(DOCKER_IMAGE) \
 	    sh -lc 'composer create-project laravel/laravel:^11.0 . && composer config minimum-stability dev && composer config prefer-stable true'; \
 	else \
@@ -76,12 +82,15 @@ composer-link: devapp init-script
 	fi; \
 	echo "🔑 Using GitHub token ****(hidden)"; \
 	echo "🔑 Using Google Fonts Api Key ****(hidden)"; \
+	mkdir -p $(COMPOSER_CACHE); \
 	docker run --rm -u $$(id -u):$$(id -g) \
 	  -e GITHUB_TOKEN="$$GITHUB_TOKEN" \
 	  -e GOOGLE_FONTS_API_KEY="$$GOOGLE_FONTS_API_KEY" \
+	  -e COMPOSER_CACHE_DIR="/tmp/composer-cache" \
+	  -v "$(COMPOSER_CACHE)":/tmp/composer-cache \
 	  -v "$(PKG_PATH_ABS)":/pkg \
 	  -v "$(DEVAPP_ABS)":/app -w /app $(DOCKER_IMAGE) \
-	  sh -lc 'export COMPOSER_AUTH="{\"github-oauth\":{\"github.com\":\"$$GITHUB_TOKEN\"}}"; export GOOGLE_FONTS_API_KEY="$$GOOGLE_FONTS_API_KEY"; bash /app/init-repo.sh'
+	  sh -lc 'export COMPOSER_AUTH="{\"github-oauth\":{\"github.com\":\"$$GITHUB_TOKEN\"}}"; export GOOGLE_FONTS_API_KEY="$$GOOGLE_FONTS_API_KEY"; bash /app/init-package.sh'
 
 # ---- Configure SQLite for a DB-less, fast bootstrap -------------------------
 env-sqlite: devapp
@@ -119,10 +128,13 @@ app-key:
 docker-up: up
 up:
 	@set -e; \
+	mkdir -p $(COMPOSER_CACHE); \
 	echo "🚀 Corriendo contenedor con imagen $(DOCKER_IMAGE), exponiendo puertos 8000 y 5173"; \
 	docker run --rm -it --privileged \
 	  -u $$(id -u):$$(id -g) \
 	  -e GITHUB_TOKEN="$$GITHUB_TOKEN" \
+	  -e COMPOSER_CACHE_DIR="/tmp/composer-cache" \
+	  -v "$(COMPOSER_CACHE)":/tmp/composer-cache \
 	  -v "$(PKG_PATH_ABS)":/pkg \
 	  -v "$(DEVAPP_ABS)":/app -w /app \
 	  -p 8000:8000 \
@@ -138,6 +150,8 @@ logs:
 
 bash:
 	@docker run --rm -it -u $$(id -u):$$(id -g) \
+	  -e COMPOSER_CACHE_DIR="/tmp/composer-cache" \
+	  -v "$(COMPOSER_CACHE)":/tmp/composer-cache \
 	  -v "$(PKG_PATH_ABS)":/pkg \
 	  -v "$(DEVAPP_ABS)":/app -w /app \
 	  -p 8080:80 \
@@ -149,9 +163,9 @@ clean-dev-env: down
 	@echo "🧹 Cleaned $(APP_DIR) and stopped containers"
 
 init-script: devapp
-	@echo "📝 Writing /$(APP_DIR)/init-repo.sh"
-	@cat $(PKG_PATH_ABS)/resources/docker/init-repo.sh > $(APP_DIR)/init-repo.sh
-	@chmod +x $(APP_DIR)/init-repo.sh
+	@echo "📝 Writing /$(APP_DIR)/init-package.sh"
+	@cat $(PKG_PATH_ABS)/resources/docker/init-package.sh > $(APP_DIR)/init-package.sh
+	@chmod +x $(APP_DIR)/init-package.sh
 	@echo "📝 Writing /$(APP_DIR)/start.sh"
 	@cat $(PKG_PATH_ABS)/resources/docker/start-dev.sh > $(APP_DIR)/start.sh
 	@chmod +x $(APP_DIR)/start.sh
