@@ -3,6 +3,7 @@
 namespace Enmaca\Backoffice\FontManager\Domains\Typography\Queries;
 
 use Enmaca\Backoffice\FontManager\Models\GoogleFontFamilies;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -17,7 +18,6 @@ use Uxmal\Backoffice\Support\Enums\ButtonSizeEnum;
 use Uxmal\Backoffice\Support\Enums\ButtonTypeEnum;
 use Uxmal\Backoffice\Support\Enums\DivFlexJustifyContentEnum;
 use Uxmal\Backoffice\Support\Enums\UITabTypeEnum;
-use Uxmal\Backoffice\UI\Tab;
 
 #[RegisterQuery('/v1/font-manager/google-fonts/get.gridjs', 'get', 'qry.font-manager.google-fonts.get.v1')]
 class GoogleFonts
@@ -29,7 +29,7 @@ class GoogleFonts
     ];
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function __invoke(Request $request): JsonResponse
     {
@@ -85,9 +85,7 @@ class GoogleFonts
                     } else {
                         $tags = [];
                     }
-
-
-                    return $row->family . '<br>' . $row->category; //.'<br>Tags: ('.implode(",", $tags).')';
+                    return $row->family . '<br>' . $row->category; // . '<br>Tags: (' . implode(",", $tags) . ')';
                 },
                 'preview' => function ($row) {
                     $tabMain = UI::tab(str::camel('tab_' . $row->family))->tabType(UITabTypeEnum::Tabs);
@@ -130,7 +128,7 @@ class GoogleFonts
                 'version' => function ($row) {
                     return $row->version;
                 },
-                'action' => function ($row) use ($versionPath) {
+                'action' => function ($row) {
                     $fontsDownloaded = 0;
                     $fontsCount = count($row->files);
                     foreach ($row->files as $file) {
