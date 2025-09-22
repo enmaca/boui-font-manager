@@ -47,11 +47,11 @@ class FontManagerServiceProvider extends ServiceProvider
 
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 
         $this->publishes([
-            __DIR__.'/../resources/js' => base_path('resources/js/product-designer/'),
-            __DIR__.'/../resources/scss' => base_path('resources/scss/product-designer/'),
-        ], 'product-designer-assets');
+            __DIR__.'/../resources/js/app-assets' => base_path('resources/js'),
+        ], 'public');
 
         if ($this->app->runningInConsole()) {
             $this->commands([
