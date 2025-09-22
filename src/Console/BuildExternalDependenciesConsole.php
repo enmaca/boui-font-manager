@@ -24,7 +24,7 @@ class BuildExternalDependenciesConsole extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): bool
+    public function handle(): int
     {
         $this->info('Building glyphr-2-studio...');
         $force = $this->option('force');
@@ -39,7 +39,7 @@ class BuildExternalDependenciesConsole extends Command
             $process->run();
         } else {
             if (! $this->cloneGlyphrStudio2()) {
-                return false;
+                return Command::FAILURE;
             }
         }
 
@@ -62,12 +62,12 @@ class BuildExternalDependenciesConsole extends Command
         $process = new Process(['mv', $externalSource.'/dist', $targetDir]);
         $process->run();
 
-        $process = new Process(['mv', $targetDir.'/font-edit.html', $targetDir.'/index.html']);
+        $process = new Process(['mv', $externalSource.'/font-edit.html', $targetDir.'/index.html']);
         $process->run();
 
         $this->info('Done');
 
-        return true;
+        return Command::SUCCESS;
     }
 
     private function cloneGlyphrStudio2(): bool
