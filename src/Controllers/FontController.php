@@ -3,11 +3,8 @@
 namespace Enmaca\Backoffice\FontManager\Controllers;
 
 use Enmaca\Backoffice\FontManager\Models\FontFiles;
-use Enmaca\Backoffice\FontManager\Models\FontVariant;
-use Enmaca\Backoffice\FontManager\Models\GoogleFontFiles;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class FontController
