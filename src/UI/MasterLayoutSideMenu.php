@@ -28,7 +28,7 @@ class MasterLayoutSideMenu
                 SideMenu::item('Catálogo')
                     ->route('enmaca.font-manager.catalog')
                     ->icon(UI::icon()->ri('function-line')),
-                SideMenu::item('Catetgorías')
+                SideMenu::item('Categorías')
                     ->route('enmaca.font-manager.category')
                     ->icon(UI::icon()->ri('stack-line')),
             ]);
