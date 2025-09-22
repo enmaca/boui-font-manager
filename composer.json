@@ -31,7 +31,6 @@
       ]
     }
   },
-  "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
     "php": "^8.2 || ^8.3",
@@ -42,14 +41,11 @@
     "illuminate/database": "*",
     "symfony/dom-crawler": "^7.0",
     "symfony/css-selector": "^7.0",
-    "laravel/framework": "^10.35|^11.0|^12.0",
-    "ext-pdo": "*",
-    "doctrine/dbal": "^3.8",
     "opis/closure": "^3.6",
     "guzzlehttp/guzzle": "^7.4",
-    "uxmaltech/core": "*",
-    "uxmaltech/backoffice-ui": "dev-ADR-001",
-    "uxmaltech/backend-cbq": "*",
+    "uxmaltech/core": "dev-main",
+    "uxmaltech/backoffice-ui": "dev-main",
+    "uxmaltech/backend-cbq": "dev-main",
     "dompdf/php-font-lib": "^1.0",
     "ext-fileinfo": "*"
   },
@@ -60,25 +56,17 @@
   },
   "repositories": {
     "uxmaltech-core": {
-      "type": "path",
-      "url": "../../uxmaltech/core",
-      "options": {
-        "symlink": true
-      }
+      "type": "vcs",
+      "url": "git@github.com:uxmaltech/core.git"
     },
-    "uxmaltech-backoffice-ui": {
-      "type": "path",
-      "url": "../../uxmaltech/backoffice-ui",
-      "options": {
-        "symlink": true
-      }
+    "backend-cbq": {
+      "type": "vcs",
+      "url": "git@github.com:uxmaltech/backend-cbq.git"
     },
-    "uxmaltech-backend-cbq": {
-      "type": "path",
-      "url": "../../uxmaltech/backend-cbq",
-      "options": {
-        "symlink": true
-      }
+    "backoffice-ui": {
+      "type": "vcs",
+      "url": "git@github.com:uxmaltech/backoffice-ui.git"
     }
-  }
+  },
+  "minimum-stability": "dev"
 }
