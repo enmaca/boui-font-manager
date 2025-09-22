@@ -13,6 +13,9 @@ PKG_PATH_ABS      := $(abspath $(PKG_PATH))
 DEVAPP_ABS        := $(abspath $(APP_DIR))
 DC                 := docker compose -f ./docker-compose.yml
 
+# Optional memory limit for docker run (example: make MEM_LIMIT=8g)
+MEM_LIMIT ?=4g
+
 # Composer cache directory on host (override with: make COMPOSER_CACHE=...)
 COMPOSER_CACHE     ?= $(HOME)/.cache/composer
 
@@ -45,7 +48,7 @@ devapp:
 	  echo "📦 Creating Laravel app in $(APP_DIR)"; \
 	  mkdir -p $(APP_DIR); \
 	  mkdir -p $(COMPOSER_CACHE); \
-	  docker run --rm -u $$(id -u):$$(id -g) \
+	  docker run $(if $(MEM_LIMIT),--memory=$(MEM_LIMIT) --memory-swap=$(MEM_LIMIT),) --rm -u $$(id -u):$$(id -g) \
 	    -e COMPOSER_CACHE_DIR="/tmp/composer-cache" \
 	    -v "$(COMPOSER_CACHE)":/tmp/composer-cache \
 	    -v $(PWD)/$(APP_DIR):/app -w /app $(DOCKER_IMAGE) \
@@ -83,7 +86,7 @@ composer-link: devapp init-script
 	echo "🔑 Using GitHub token ****(hidden)"; \
 	echo "🔑 Using Google Fonts Api Key ****(hidden)"; \
 	mkdir -p $(COMPOSER_CACHE); \
-	docker run --rm -u $$(id -u):$$(id -g) \
+	docker run $(if $(MEM_LIMIT),--memory=$(MEM_LIMIT) --memory-swap=$(MEM_LIMIT),) --rm -u $$(id -u):$$(id -g) \
 	  -e GITHUB_TOKEN="$$GITHUB_TOKEN" \
 	  -e GOOGLE_FONTS_API_KEY="$$GOOGLE_FONTS_API_KEY" \
 	  -e COMPOSER_CACHE_DIR="/tmp/composer-cache" \
@@ -119,7 +122,7 @@ fix-perms:
 
 app-key:
 	@echo "🔐 Generating app key via docker run"
-	@docker run --rm -u $$(id -u):$$(id -g) \
+	@docker run $(if $(MEM_LIMIT),--memory=$(MEM_LIMIT) --memory-swap=$(MEM_LIMIT),) --rm -u $$(id -u):$$(id -g) \
 		-v "$(DEVAPP_ABS)":/app -w /app \
 		$(DOCKER_IMAGE) \
 		sh -lc 'php artisan key:generate --force' || true
@@ -130,7 +133,7 @@ up:
 	@set -e; \
 	mkdir -p $(COMPOSER_CACHE); \
 	echo "🚀 Corriendo contenedor con imagen $(DOCKER_IMAGE), exponiendo puertos 8000 y 5173"; \
-	docker run --rm -it --privileged \
+	docker run $(if $(MEM_LIMIT),--memory=$(MEM_LIMIT) --memory-swap=$(MEM_LIMIT),) --rm -it --privileged \
 	  -u $$(id -u):$$(id -g) \
 	  -e GITHUB_TOKEN="$$GITHUB_TOKEN" \
 	  -e COMPOSER_CACHE_DIR="/tmp/composer-cache" \
@@ -149,7 +152,7 @@ logs:
 	@echo "⚠️ Logs desde docker run no se pueden seguir una vez que termine; ejecuta directamente dentro del contenedor si está corriendo"
 
 bash:
-	@docker run --rm -it -u $$(id -u):$$(id -g) \
+	@docker run $(if $(MEM_LIMIT),--memory=$(MEM_LIMIT) --memory-swap=$(MEM_LIMIT),) --rm -it -u $$(id -u):$$(id -g) \
 	  -e COMPOSER_CACHE_DIR="/tmp/composer-cache" \
 	  -v "$(COMPOSER_CACHE)":/tmp/composer-cache \
 	  -v "$(PKG_PATH_ABS)":/pkg \
