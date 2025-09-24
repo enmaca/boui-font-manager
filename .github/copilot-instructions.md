@@ -76,7 +76,9 @@ These instructions tell GitHub Copilot how to understand, build, and extend this
 - Document **complexity**, **side‑effects**, and **risks** (e.g., N+1 queries, long‑running tasks).
 
 ### 4.2 OpenAPI with `OpenApi\Attributes`
-- Keep schemas **centralized** in `src/Domains/{Domain}/V1/Schemas/` using `#[OA\Schema]`.
+- Keep schemas **centralized** in `src/Domains/V1/Schemas/` using `#[OA\Schema]`.
+- Keep resources **centralized** in `src/Domains/V1/Resources/` implementing `ResourceInterface`.
+- Commands and queries remain domain-specific in `src/Domains/{Domain}/Commands/` and `src/Domains/{Domain}/Queries/`.
 - Reference schemas with `ref: '#/components/schemas/...'` and include **examples** & **descriptions** on scalars and objects.
 - Reuse components for **pagination**, **errors**, and **metadata**.
 

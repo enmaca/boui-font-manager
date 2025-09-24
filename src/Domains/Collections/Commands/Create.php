@@ -29,7 +29,7 @@ class Create
     const RESOURCE = CollectionResource::class;
 
     public array $payloadValidator = [
-        'name' => 'required|string|max:255|unique:font_categories,name',
+        'name' => 'required|string|max:255|unique:font_collections,name',
         'description' => 'nullable|string|max:1000',
     ];
 

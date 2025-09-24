@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * Provides standard methods for data transformation and localization
  * across all collection-related API resources.
  *
- * @package Enmaca\Backoffice\FontManager\Domains\Collections\V1\Resources
+ * @package Enmaca\Backoffice\FontManager\Domains\V1\Resources
  */
 interface ResourceInterface
 {

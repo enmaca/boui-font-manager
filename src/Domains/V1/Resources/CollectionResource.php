@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 class CollectionResource implements ResourceInterface
 {
     /**
-     * The FontCategory model instance.
+     * The FontCollection model instance.
      */
     protected FontCollection $model;
 
@@ -29,7 +29,7 @@ class CollectionResource implements ResourceInterface
     /**
      * Create a new CollectionResource instance.
      *
-     * @param FontCollection $model The font category model
+     * @param FontCollection $model The font collection model
      * @param string $lang Language code for localization
      */
     public function __construct(FontCollection $model, string $lang = 'es')
@@ -41,15 +41,15 @@ class CollectionResource implements ResourceInterface
     /**
      * Create a resource instance from an Eloquent model.
      *
-     * @param Model $model The FontCategory model to transform
+     * @param Model $model The FontCollection model to transform
      * @param string $lang Language code for localization (default: 'es')
      * @return static New CollectionResource instance
-     * @throws \InvalidArgumentException If model is not a FontCategory instance
+     * @throws \InvalidArgumentException If model is not a FontCollection instance
      */
     public static function fromModel(Model $model, string $lang = 'es'): static
     {
         if (!$model instanceof FontCollection) {
-            throw new \InvalidArgumentException('Model must be an instance of FontCategory');
+            throw new \InvalidArgumentException('Model must be an instance of FontCollection');
         }
 
         return new static($model, $lang);

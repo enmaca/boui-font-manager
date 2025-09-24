@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
  * Provides centralized schema definitions for all collection-related
  * API responses, ensuring consistency across endpoints.
  *
- * @package Enmaca\Backoffice\FontManager\Domains\Collections\V1\Schemas
+ * @package Enmaca\Backoffice\FontManager\Domains\V1\Schemas
  */
 class CollectionSchema
 {

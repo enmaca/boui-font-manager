@@ -30,7 +30,7 @@ class Update
     const RESOURCE = CollectionResource::class;
 
     public array $payloadValidator = [
-        'id' => 'required|integer|exists:font_categories,id',
+        'id' => 'required|integer|exists:font_collections,id',
         'name' => 'required|string|max:255',
         'description' => 'nullable|string|max:1000',
     ];
@@ -118,12 +118,12 @@ class Update
 
         // Add unique validation excluding current record
         $validator = Validator::make($request->all(), [
-            'id' => 'required|integer|exists:font_categories,id',
+            'id' => 'required|integer|exists:font_collections,id',
             'name' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('font_categories', 'name')->ignore($collectionId)
+                Rule::unique('font_collections', 'name')->ignore($collectionId)
             ],
             'description' => 'nullable|string|max:1000',
         ]);

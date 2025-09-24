@@ -25,7 +25,7 @@ class Delete
     const COMMAND_NAME = 'cmd.font-manager.collections.delete.v1';
 
     public array $payloadValidator = [
-        'id' => 'required|integer|exists:font_categories,id',
+        'id' => 'required|integer|exists:font_collections,id',
     ];
 
     /**
