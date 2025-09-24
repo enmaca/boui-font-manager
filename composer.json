@@ -68,5 +68,11 @@
       "url": "git@github.com:uxmaltech/backoffice-ui.git"
     }
   },
-  "minimum-stability": "dev"
+  "minimum-stability": "dev",
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true,
+      "tbachert/spi": true
+    }
+  }
 }
