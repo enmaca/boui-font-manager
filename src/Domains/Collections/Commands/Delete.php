@@ -2,7 +2,7 @@
 
 namespace Enmaca\Backoffice\FontManager\Domains\Collections\Commands;
 
-use Enmaca\Backoffice\FontManager\Models\FontCategory;
+use Enmaca\Backoffice\FontManager\Models\FontCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -112,8 +112,8 @@ class Delete
         }
 
         try {
-            $collection = FontCategory::findOrFail($request->input('id'));
-            
+            $collection = FontCollection::findOrFail($request->input('id'));
+
             // Check business rule: collection must not have assigned fonts
             $fontsCount = $collection->fonts()->count();
             if ($fontsCount > 0) {
@@ -124,7 +124,7 @@ class Delete
             }
 
             $collectionName = $collection->name;
-            
+
             // Soft delete would be better for audit trail, but using hard delete as per current schema
             $collection->delete();
 
