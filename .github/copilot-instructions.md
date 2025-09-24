@@ -1,187 +1,88 @@
-# GitHub Copilot Instructions
+# GitHub Copilot — Repository Custom Instructions (boui-font-manager)
 
-## Repository overview
-- **Package goal:** Laravel package that extends the uxmaltech Backoffice UI ecosystem to manage typography assets (catalogs, categories, versioning) inside backoffice experiences.【F:composer.json†L2-L50】【F:src/FontManagerServiceProvider.php†L48-L60】
-- **Dev workflow:** A Makefile-driven Docker environment bootstraps a disposable Laravel app, publishes package assets, and exposes Laravel/Vite dev servers for rapid iteration.【F:README.md†L1-L160】
+> **Path recommendation:** Place this file at `.github/copilot-instructions.md` so Copilot Chat and Copilot Agents automatically attach it to chats and tasks.
+> **Last updated:** 2025‑09‑24
 
-## Tech stack & dependencies
-- PHP 8.2+/Laravel components, Livewire 3, Symfony tooling, Guzzle, DOMPDF font utilities, and uxmaltech packages (`core`, `backoffice-ui`, `backend-cbq`).【F:composer.json†L35-L51】
-- JavaScript assets rely on the global `boui` runtime provided by `uxmaltech/backoffice-ui` and Vite builds published through the package service provider.【F:src/FontManagerServiceProvider.php†L48-L55】【F:resources/js/catalog.js†L1-L66】
-
-## Architecture tour
-### Service provider & bootstrap
-- `FontManagerServiceProvider` wires optional skeleton services, registers CQRS commands/queries from `src/Domains`, loads routes & migrations, publishes JS assets, and registers artisan commands when running in console.【F:src/FontManagerServiceProvider.php†L16-L60】
-
-### Domain registration
-- Domain APIs live under `src/Domains`; `RegisterCmdQry` scans this directory to expose command/query endpoints with OpenAPI metadata starting from `BaseQueryV1`. Extend these classes to surface new backend operations.【F:src/FontManagerServiceProvider.php†L31-L34】【F:src/Domains/BaseQueryV1.php†L3-L16】
-
-### HTTP controllers & layouts
-- Controllers extend the host Laravel app controller base, compose Backoffice UI layouts, and render cards/grids via fluent builders (e.g., `TypographyCatalogController`). Inject `MasterLayout` to configure chrome and register required Vite assets before returning rendered HTML.【F:src/Controllers/TypographyCatalogController.php†L13-L50】
-
-### UI composition layer
-- UI fragments implement `ContentInterface::getMainContent()` and typically return arrays of fluent Backoffice UI builders (cards, GridJS tables, modals, actions). Keep composition declarative and reuse helper classes such as `Html`, `UI`, and action enums as shown in `UI/Catalog/Content`.【F:src/UI/ContentInterface.php†L3-L7】【F:src/UI/Catalog/Content.php†L20-L75】
-
-### Front-end integration
-- JavaScript modules inside `resources/js` register Boui event handlers, use CBQ for backend calls, and refresh UI components (`boui.get(...).reload()`). Follow the event-driven patterns already in `catalog.js` when wiring new interactions.【F:resources/js/catalog.js†L5-L63】
-
-### Console tooling
-- Package commands such as `boui-font-manager:build-external-dependencies` orchestrate cloning/building external font editors and asset publishing. Mirror this pattern (signature, description, `handle()` orchestration) when creating new artisan tooling.【F:src/Console/BuildExternalDependenciesConsole.php†L8-L109】
-
-### Routing
-- HTTP entry points are defined in `routes/web.php` and use single-action controllers; register additional routes within the service provider context and keep naming consistent with the `enmaca.font-manager.*` namespace.【F:routes/web.php†L7-L13】
-
-## Assets & publishing
-- JS bundles under `resources/js/app-assets` are published to the host app via the `public` tag in the service provider; additional static assets (e.g., Glyphr Studio build artifacts) are produced by console commands into `public/font-edit`. Align new asset paths with these publishing hooks.【F:src/FontManagerServiceProvider.php†L48-L60】【F:src/Console/BuildExternalDependenciesConsole.php†L31-L68】
-
-## Development workflow
-1. Run `make start-dev-env` to build the Docker image, scaffold the throwaway Laravel app, link the package, and start Laravel/Vite servers.【F:README.md†L34-L112】
-2. Provide `GITHUB_TOKEN` and `GOOGLE_FONTS_API_KEY` via environment or `.env` to unlock composer installs and Google Fonts sync tooling.【F:README.md†L7-L139】
-3. Use `make up` / `make down` for iterative work; the dev app is ephemeral and can be reset with `make clean-dev-env`.【F:README.md†L80-L139】
-
-## Copilot prompting tips
-- **Reuse specialized instructions:** When editing Backoffice UI PHP builders or layouts, include `.github/instructions/backoffice-ui-php.instructions.md` to guide Copilot towards fluent APIs and resource registration patterns.【F:.github/instructions/backoffice-ui-php.instructions.md†L1-L24】
-- **For Boui front-end work:** Reference `.github/instructions/backoffice-ui-boui.instructions.md` to remind Copilot about `boui.waitFor`, event naming, declarative actions, and initialization best practices before generating JS/HTML snippets.【F:.github/instructions/backoffice-ui-boui.instructions.md†L1-L56】
-- **Context to share with Copilot:**
-  - Identify the target layer (service provider, domain, controller, UI builder, JS module) and surface the relevant file or method signature.
-  - Describe the desired outcome declaratively (e.g., “add a modal that dispatches a Boui event when confirmed”) so Copilot leverages fluent builders and CBQ helpers instead of manual HTML/JS glue.【F:.github/instructions/backoffice-ui-php.instructions.md†L19-L23】
-  - Mention supporting assets or routes that need to be registered to ensure Copilot adds `viteAsset` calls, publishes resources, or updates route maps accordingly.【F:src/FontManagerServiceProvider.php†L48-L60】【F:src/Controllers/TypographyCatalogController.php†L39-L50】
-
-## Quality & testing expectations
-- Prefer extending existing builders and helpers over manual markup; they provide consistent styling and data attributes expected by Boui. This keeps new features aligned with Backoffice UI semantics.【F:.github/instructions/backoffice-ui-php.instructions.md†L5-L33】
-- After significant JS changes, confirm events/actions align with patterns in `catalog.js` and leverage Boui logging helpers from the instructions to debug during development.【F:resources/js/catalog.js†L5-L63】【F:.github/instructions/backoffice-ui-boui.instructions.md†L14-L55】
-- For automation-heavy updates (commands, external builds), replicate the process-driven structure used in `BuildExternalDependenciesConsole` and surface options/flags for idempotency.【F:src/Console/BuildExternalDependenciesConsole.php†L15-L70】
-
-
-## Estándares de documentación
-
-### 1) PHPDoc (archivo, clase, constantes, propiedades, métodos)
-
-- Describir **qué hace**, **por qué**, y **cómo se usa**.
-- Incluir `@package`, `@param`, `@return`, `@throws`, `@template` cuando aplique.
-- Documentar **complejidad, side-effects** y **posibles riesgos** (p. ej., N+1 queries).
-- Ejemplo rápido:
-
-```php
-<?php
-/**
- * Query class for retrieving early access movies.
- *
- * Provides endpoint for fetching movies that are available for early access,
- * with authentication required via Sanctum middleware.
- *
- * @package Anystream\Movies\Queries
- */
-
-namespace App\Domains\Anystream\Movies\Queries;
-
-use App\Domains\Anystream\V1\Resources\MovieShortResource;
-use App\Domains\Core\Queries\BaseQuery;
-use App\Exceptions\AnystreamServerException;
-use App\Models\MovieContent;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use OpenApi\Attributes as OA;
-use Uxmal\Backend\Attributes\RegisterQuery;
-
-#[RegisterQuery('/v1/anystream/movies/early-access', name: 'qry.anystream.movies.early-access.v1', middleware: ['auth:sanctum'])]
-class EarlyAccess extends BaseQuery
-{
-    /** Query name constant for tracking/logging purposes. */
-    const QUERY_NAME = 'qry.anystream.movies.early-access.v1';
-
-    /** Resource class used for data transformation. */
-    const RESOURCE = MovieShortResource::class;
-
-    /** Metadata for consistent pagination responses. */
-    const META = [
-        'collection' => 'Early Access',
-        'type' => 'movie-short',
-        'description' => 'Fetches a list of movies available for early access to authenticated users.',
-    ];
-
-    /**
-     * Retrieve early access movies for authenticated users.
-     *
-     * Fetches a curated list of movies available for early access,
-     * including metadata like ratings, covers, and streaming links.
-     * Uses eager loading to prevent N+1 query issues.
-     *
-     * @param  Request  $request  The HTTP request instance
-     * @return JsonResponse Collection of early access movies
-     *
-     * @throws AnystreamServerException When movie fetching fails
-     */
-    #[OA\Get(
-        path: '/v1/anystream/movies/early-access',
-        description: 'Retrieves a list of movies available for early access to authenticated users',
-        summary: 'Get early access movies',
-        security: [['sanctum' => []]],
-        tags: ['Movies', 'Early Access'],
-        parameters: [
-            new OA\Parameter(ref: '#/components/parameters/PageParameter'),
-            new OA\Parameter(ref: '#/components/parameters/PerPageParameter'),
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: 'Successful retrieval of early access movies',
-                content: new OA\JsonContent(ref: '#/components/schemas/MovieShortReel')
-            ),
-            new OA\Response(
-                response: 500,
-                description: 'Server error while fetching content',
-                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')
-            ),
-        ]
-    )]
-    public function __invoke(Request $request): JsonResponse
-    {
-        try {
-            $this->setQuery(MovieContent::query()
-                ->select(['id', 'rating', 'title', 'published_date', 'multimedia_group_id'])
-                ->where('published', 'yes')
-                ->whereHas('multimediaGroup', fn ($q) => $q->where('type', 'moviecontent'))
-                ->with([
-                    'multimediaGroup:id,uuid',
-                    'images' => fn ($q) => $q->select(['id', 'type', 'type_id', 'category_type', 'default', 'url'])
-                        ->where('type', 'movies')
-                        ->whereIn('category_type', ['poster', 'backdrop'])
-                        ->where('default', 'yes'),
-                    'translations' => fn ($q) => $q->select(['id', 'foreignkey_id', 'locale', 'field', 'content'])
-                        ->where('locale', 'spa')
-                        ->where('field', 'title'),
-                    'movieGenres:id,name',
-                ])
-                ->orderByDesc('published_date')
-            );
-
-            return response()->json($this->buildResponse());
-
-        } catch (AnystreamServerException $e) {
-            throw new AnystreamServerException($e->getMessage(), $e->getCode());
-        }
-    }
-}
-```
-
-### 2) OpenAPI con OpenApi\Attributes
-
-**Schemas centralizados**: Usar SOLO `app/Domains/Anystream/V1/Schemas/` para definir `#[OA\Schema]`.
-
-**Referencias**: Usar `ref: '#/components/schemas/...'` para referenciar esquemas.
-
-**Ejemplos**: Incluir `example` y `description` en propiedades scalar y objetos.
-
-**Esquemas reusables**: Definir paginación estándar, errores y metadatos como componentes reutilizables.
+These instructions tell GitHub Copilot how to understand, build, and extend this Laravel package that powers typography management inside the **uxmaltech Backoffice UI** ecosystem.
 
 ---
 
-## Resources y transformación de datos
+## 1) Project context (what Copilot should know first)
 
-### Interface obligatoria
+- **Goal:** Manage typography assets (catalogs, categories, versioning) for Backoffice UI pages.
+- **Stack:** PHP 8.2+/Laravel 11, Livewire 3, Symfony/Console, Guzzle, DOMPDF font utilities, and uxmaltech packages (`core`, `backoffice-ui`, `backend-cbq`).
+- **Front‑end:** Event‑driven JS modules under `resources/js` that run on the global **`boui`** runtime from `uxmaltech/backoffice-ui` and call the backend through **CBQ**.
+- **Key entry points:**
+  - **Service Provider:** `src/FontManagerServiceProvider.php` (routes, assets, migrations, CQRS discovery, console commands).
+  - **Domains (CQRS):** `src/Domains/*` scanned by `RegisterCmdQry` (queries extend `BaseQueryV1`).
+  - **Controllers:** `src/Controllers/*` (single‑action). Use `MasterLayout` + fluent Backoffice UI builders.
+  - **UI builders:** `src/UI/*` implementing `ContentInterface::getMainContent()` to return arrays of fluent builders (cards, grids, modals, actions).
+  - **Routes:** `routes/web.php` (namespace **`enmaca.font-manager.*`**).
+  - **JS modules:** `resources/js/*.js` (listen/emit Boui events, refresh components via `boui.get(...).reload()`).
+  - **Console:** `src/Console/*` (e.g., `boui-font-manager:build-external-dependencies` to clone/build external font editors and publish artifacts).
 
-Todos los Resources DEBEN implementar `ResourceInterface`:
+---
 
+## 2) Build & run (how to validate changes)
+
+- **Dev loop (Docker + ephemeral Laravel app):**
+  1) `make start-dev-env` — build image, scaffold disposable app, link package, start Laravel & Vite.
+  2) `make up` / `make down` — start/stop services during iteration.
+  3) `make clean-dev-env` — reset the ephemeral app.
+- **Required env:** set `GITHUB_TOKEN` (composer access) and `GOOGLE_FONTS_API_KEY` (fonts sync tooling).
+- **Assets:** JS bundles under `resources/js/app-assets` are published by the service provider (`public` tag). Console commands may write build artifacts to `public/font-edit`.
+
+> **Definition of Done for Copilot changes**
+> - App boots without errors, UI loads, and relevant Boui events fire.
+> - Any new page registers its Vite assets and renders via Backoffice UI builders.
+> - CQRS endpoints expose OpenAPI metadata and return typed resources.
+> - All commands are idempotent and log clear progress/errors.
+
+---
+
+## 3) Coding rules Copilot must follow
+
+### 3.1 Controllers & layouts
+- Use **single‑action controllers** and extend the host app’s base controller.
+- Compose pages with **Backoffice UI fluent builders** (`UI::`, `Html::`, `Badge::`, `Icon::`, GridJS, modals, actions). **Avoid raw Blade/HTML** unless a builder is missing.
+- Always **inject `MasterLayout`**, register required assets (e.g., `viteAsset('...')`), and return rendered HTML.
+
+### 3.2 UI composition layer
+- Implement `ContentInterface::getMainContent()` to return the **array of builders**. Keep composition declarative.
+- Prefer helper classes and enums; don’t hand‑wire data attributes that Backoffice UI already provides.
+
+### 3.3 CQRS (queries/commands)
+- New endpoints must live under `src/Domains/...` and extend the base classes (e.g., `BaseQueryV1`).
+- Register via attributes so `RegisterCmdQry` can auto‑discover and expose **OpenAPI** metadata.
+- Use eager loading to avoid N+1 queries and return typed resources.
+
+### 3.4 Front‑end integration
+- JS modules **listen/emit Boui events** and call backend via **CBQ**. Example patterns live in `resources/js/catalog.js`.
+- Refresh components with `boui.get(<id>).reload()`; avoid manual DOM patching.
+
+### 3.5 Routing
+- Define HTTP entry points in `routes/web.php` using single‑action controllers.
+- **Namespacing:** `enmaca.font-manager.*` for route names (e.g., `enmaca.font-manager.catalog`).
+
+### 3.6 Console tooling
+- Follow the `Symfony\Console` pattern: signature, description, clear `handle()` orchestration, idempotent steps, and structured logging.
+
+---
+
+## 4) Documentation, OpenAPI & Resources
+
+### 4.1 PHPDoc (file/class/constants/properties/methods)
+- Explain **what**, **why**, and **how to use**; include `@package`, `@param`, `@return`, `@throws`, `@template` when applicable.
+- Document **complexity**, **side‑effects**, and **risks** (e.g., N+1 queries, long‑running tasks).
+
+### 4.2 OpenAPI with `OpenApi\Attributes`
+- Keep schemas **centralized** in `src/Domains/V1/Schemas/` using `#[OA\Schema]`.
+- Keep resources **centralized** in `src/Domains/V1/Resources/` implementing `ResourceInterface`.
+- Commands and queries remain domain-specific in `src/Domains/{Domain}/Commands/` and `src/Domains/{Domain}/Queries/`.
+- Reference schemas with `ref: '#/components/schemas/...'` and include **examples** & **descriptions** on scalars and objects.
+- Reuse components for **pagination**, **errors**, and **metadata**.
+
+### 4.3 Resources & data transformation (required interface)
 ```php
 interface ResourceInterface
 {
@@ -189,3 +90,61 @@ interface ResourceInterface
     public function toArray(): array;
 }
 ```
+- Return **immutable** arrays ready for JSON serialization. Prefer locale‑aware fields via `fromModel($model, $lang)`.
+
+---
+
+## 5) How to prompt Copilot effectively (do this)
+
+- **Start general, then get specific:** Give a short goal, then list precise changes.
+- **Ground the request:** Mention the **target file(s)/method(s)** and the **layer** (service provider, domain, controller, UI builder, JS module).
+- **Provide examples & acceptance criteria:** e.g., “Add a modal that dispatches a Boui event on confirm; page must register `viteAsset(...)`; include OpenAPI docs for the new query.”
+- **Avoid ambiguity:** Specify names (route, event, builder IDs), constraints, and error handling.
+- **Keep context tight:** Share only the relevant snippet or path and remove unrelated noise.
+
+> **Shortcut:** Include these helper guides when chatting with Copilot:
+> - `.github/instructions/backoffice-ui-php.instructions.md`
+> - `.github/instructions/backoffice-ui-boui.instructions.md`
+
+---
+
+## 6) Guardrails & quality checks
+
+- Prefer existing builders/helpers over custom markup or ad‑hoc JS.
+- JS changes must align with patterns in `resources/js/catalog.js`; add Boui log calls when debugging.
+- New console tasks should be **re‑runnable** and emit structured logs.
+- Security & privacy: never hard‑code secrets; respect `.env`; avoid leaking tokens or PII in logs.
+- PRs must include: runnable steps, screenshots (if UI), and API examples or OpenAPI changes.
+
+---
+
+## 7) Quick checklist (copy‑paste into PR description)
+
+- [ ] Build: `make start-dev-env` succeeds; feature works end‑to‑end.
+- [ ] UI: Uses Backoffice UI builders, assets registered, Boui events emitted/listened.
+- [ ] API: Query/command documented with OpenAPI; no N+1; returns typed resources.
+- [ ] Tests/Manual: Steps to validate included; console commands idempotent.
+- [ ] Docs: PHPDoc updated; README/usage notes added if needed.
+
+---
+
+## 8) Appendix: common routes (examples)
+
+```php
+// Keep route names under enmaca.font-manager.*
+Route::get('/font-manager/catalog', TypographyCatalogController::class.'@index')
+    ->name('enmaca.font-manager.catalog');
+Route::get('/font-manager/category', TypographyCategoryController::class.'@index')
+    ->name('enmaca.font-manager.category');
+```
+
+```js
+// Boui event refresh example
+boui.on('fonts:catalog:changed', () => boui.get('fonts-catalog-grid').reload());
+```
+
+---
+
+### Notes for maintainers
+- If this file is **not** located at `.github/copilot-instructions.md`, move it there to ensure automatic attachment in Copilot Chat and Copilot Agents.
+- Keep this document concise and updated—Copilot uses it as live context.
