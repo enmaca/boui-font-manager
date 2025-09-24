@@ -1,6 +1,6 @@
 <?php
 
-namespace Enmaca\Backoffice\FontManager\Domains\Collections\V1\Schemas;
+namespace Enmaca\Backoffice\FontManager\Domains\V1\Schemas;
 
 use OpenApi\Attributes as OA;
 
