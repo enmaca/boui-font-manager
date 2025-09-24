@@ -2,8 +2,8 @@
 
 namespace Enmaca\Backoffice\FontManager\Domains\Collections\Commands;
 
-use Enmaca\Backoffice\FontManager\Domains\Collections\V1\Resources\CollectionResource;
-use Enmaca\Backoffice\FontManager\Models\FontCategory;
+use Enmaca\Backoffice\FontManager\Domains\V1\Resources\CollectionResource;
+use Enmaca\Backoffice\FontManager\Models\FontCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -115,7 +115,7 @@ class Update
     public function __invoke(Request $request): JsonResponse
     {
         $collectionId = $request->input('id');
-        
+
         // Add unique validation excluding current record
         $validator = Validator::make($request->all(), [
             'id' => 'required|integer|exists:font_categories,id',
@@ -137,8 +137,8 @@ class Update
         }
 
         try {
-            $collection = FontCategory::findOrFail($collectionId);
-            
+            $collection = FontCollection::findOrFail($collectionId);
+
             $collection->update([
                 'name' => $request->input('name'),
                 'description' => $request->input('description'),

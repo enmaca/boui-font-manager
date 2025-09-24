@@ -2,8 +2,8 @@
 
 namespace Enmaca\Backoffice\FontManager\Domains\Collections\Queries;
 
-use Enmaca\Backoffice\FontManager\Domains\Collections\V1\Resources\CollectionResource;
-use Enmaca\Backoffice\FontManager\Models\FontCategory;
+use Enmaca\Backoffice\FontManager\Domains\V1\Resources\CollectionResource;
+use Enmaca\Backoffice\FontManager\Models\FontCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -106,7 +106,7 @@ class Get
     {
         try {
             $this->setQueryBuilder(
-                FontCategory::withCount('fonts')
+                FontCollection::withCount('fonts')
             )
                 ->setQueryColumns([
                     'id',
@@ -127,14 +127,14 @@ class Get
                         return '<strong>' . e($row->name) . '</strong>';
                     },
                     'description' => function ($row) {
-                        return $row->description 
-                            ? e($row->description) 
+                        return $row->description
+                            ? e($row->description)
                             : '<em class="text-muted">Sin descripción</em>';
                     },
                     'fonts_count' => function ($row) {
                         $count = $row->fonts_count ?? 0;
                         $badge_style = $count > 0 ? BSStylesEnum::Success : BSStylesEnum::Secondary;
-                        
+
                         return (string) Html::div()
                             ->class('text-center')
                             ->content(

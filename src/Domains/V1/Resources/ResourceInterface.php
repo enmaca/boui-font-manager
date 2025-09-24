@@ -1,6 +1,6 @@
 <?php
 
-namespace Enmaca\Backoffice\FontManager\Domains\Collections\V1\Resources;
+namespace Enmaca\Backoffice\FontManager\Domains\V1\Resources;
 
 use Illuminate\Database\Eloquent\Model;
 

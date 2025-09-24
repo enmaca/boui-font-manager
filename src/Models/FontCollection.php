@@ -15,7 +15,7 @@ use Uxmal\Backend\Models\Traits\HashUtils;
  * along with utility methods for font counting and management.
  *
  * @package Enmaca\Backoffice\FontManager\Models
- * 
+ *
  * @property int $id Primary key
  * @property string $name Category name (unique)
  * @property string|null $description Category description
@@ -23,21 +23,21 @@ use Uxmal\Backend\Models\Traits\HashUtils;
  * @property \Illuminate\Support\Carbon $updated_at Last update timestamp
  * @property string $hash Generated hash identifier (from HashUtils trait)
  * @property int $fonts_count Dynamic attribute for font count (when using withCount)
- * 
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection<\Enmaca\Backoffice\FontManager\Models\Font> $fonts
- * @property-read \Illuminate\Database\Eloquent\Collection<\Enmaca\Backoffice\FontManager\Models\FontCategoryDetail> $categoryDetails
- * 
+ * @property-read \Illuminate\Database\Eloquent\Collection<\Enmaca\Backoffice\FontManager\Models\FontCollectionDetail> $categoryDetails
+ *
  * @method static \Illuminate\Database\Eloquent\Builder withCount(string ...$relations)
  * @method static \Illuminate\Database\Eloquent\Builder where(string $column, mixed $operator = null, mixed $value = null)
  * @method static \Illuminate\Database\Eloquent\Builder find(int $id)
  * @method static \Illuminate\Database\Eloquent\Builder findOrFail(int $id)
  */
-class FontCategory extends Model
+class FontCollection extends Model
 {
     use HashUtils;
 
     /** Database table name */
-    protected $table = 'font_categories';
+    protected $table = 'font_collections';
 
     /** Mass assignable attributes */
     protected $fillable = [
@@ -63,9 +63,9 @@ class FontCategory extends Model
     public function fonts(): BelongsToMany
     {
         return $this->belongsToMany(
-            Font::class, 
-            'font_category_details', 
-            'category_id', 
+            Font::class,
+            'font_category_details',
+            'category_id',
             'font_id'
         )->withTimestamps();
     }
@@ -76,11 +76,11 @@ class FontCategory extends Model
      * One-to-many relationship to the pivot table records. Useful for
      * accessing additional pivot data or managing relationships directly.
      *
-     * @return HasMany<FontCategoryDetail> The category details relationship
+     * @return HasMany<FontCollectionDetail> The category details relationship
      */
     public function categoryDetails(): HasMany
     {
-        return $this->hasMany(FontCategoryDetail::class, 'category_id');
+        return $this->hasMany(FontCollectionDetail::class, 'collection_id');
     }
 
     /**
