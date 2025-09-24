@@ -27,6 +27,6 @@ class Font extends Model
      */
     public function categories(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(FontCategory::class, 'font_category_details', 'font_id', 'category_id');
+        return $this->belongsToMany(FontCollection::class, 'font_collection_details', 'font_id', 'collection_id');
     }
 }
