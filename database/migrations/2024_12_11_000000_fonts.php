@@ -47,17 +47,17 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('font_categories', function (Blueprint $table) {
+        Schema::create('font_collections', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->text('description')->nullable();
             $table->timestamps();
         });
 
-        Schema::create('font_category_details', function (Blueprint $table) {
+        Schema::create('font_collection_details', function (Blueprint $table) {
             $table->id();
             $table->foreignId('font_id')->constrained('fonts')->cascadeOnDelete(); // Relación con la tabla fonts
-            $table->foreignId('category_id')->constrained('font_categories')->cascadeOnDelete(); // Relación con font_categories
+            $table->foreignId('collection_id')->constrained('font_collections')->cascadeOnDelete(); // Relación con font_categories
             $table->timestamps();
         });
     }
