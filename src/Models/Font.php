@@ -21,4 +21,12 @@ class Font extends Model
     {
         return $this->hasMany(FontVariant::class);
     }
+
+    /**
+     * Get the categories associated with this font.
+     */
+    public function categories(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(FontCategory::class, 'font_category_details', 'font_id', 'category_id');
+    }
 }
