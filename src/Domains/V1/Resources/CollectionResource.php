@@ -1,15 +1,15 @@
 <?php
 
-namespace Enmaca\Backoffice\FontManager\Domains\Collections\V1\Resources;
+namespace Enmaca\Backoffice\FontManager\Domains\V1\Resources;
 
-use Enmaca\Backoffice\FontManager\Models\FontCategory;
+use Enmaca\Backoffice\FontManager\Models\FontCollection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Resource class for transforming FontCategory models.
  *
  * Provides consistent data transformation for collection/category entities
- * across all API endpoints, including localization support and 
+ * across all API endpoints, including localization support and
  * relationship data.
  *
  * @package Enmaca\Backoffice\FontManager\Domains\Collections\V1\Resources
@@ -19,7 +19,7 @@ class CollectionResource implements ResourceInterface
     /**
      * The FontCategory model instance.
      */
-    protected FontCategory $model;
+    protected FontCollection $model;
 
     /**
      * Language code for localization.
@@ -29,10 +29,10 @@ class CollectionResource implements ResourceInterface
     /**
      * Create a new CollectionResource instance.
      *
-     * @param FontCategory $model The font category model
+     * @param FontCollection $model The font category model
      * @param string $lang Language code for localization
      */
-    public function __construct(FontCategory $model, string $lang = 'es')
+    public function __construct(FontCollection $model, string $lang = 'es')
     {
         $this->model = $model;
         $this->lang = $lang;
@@ -48,7 +48,7 @@ class CollectionResource implements ResourceInterface
      */
     public static function fromModel(Model $model, string $lang = 'es'): static
     {
-        if (!$model instanceof FontCategory) {
+        if (!$model instanceof FontCollection) {
             throw new \InvalidArgumentException('Model must be an instance of FontCategory');
         }
 
@@ -70,7 +70,7 @@ class CollectionResource implements ResourceInterface
             'fonts_count' => $this->model->fonts_count ?? $this->model->fonts()->count(),
             'created_at' => $this->model->created_at?->toISOString(),
             'updated_at' => $this->model->updated_at?->toISOString(),
-            'fonts' => $this->model->relationLoaded('fonts') 
+            'fonts' => $this->model->relationLoaded('fonts')
                 ? $this->model->fonts->map(fn($font) => [
                     'id' => $font->id,
                     'name' => $font->name,
@@ -107,7 +107,7 @@ class CollectionResource implements ResourceInterface
     public function toDetailed(): array
     {
         $data = $this->toArray();
-        
+
         // Always load fonts relationship for detailed view
         if (!$this->model->relationLoaded('fonts')) {
             $this->model->load('fonts');
