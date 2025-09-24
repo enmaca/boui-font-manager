@@ -2,8 +2,8 @@
 
 namespace Enmaca\Backoffice\FontManager\Domains\Collections\Commands;
 
-use Enmaca\Backoffice\FontManager\Domains\Collections\V1\Resources\CollectionResource;
-use Enmaca\Backoffice\FontManager\Models\FontCategory;
+use Enmaca\Backoffice\FontManager\Domains\V1\Resources\CollectionResource;
+use Enmaca\Backoffice\FontManager\Models\FontCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -111,7 +111,7 @@ class Create
         }
 
         try {
-            $collection = FontCategory::create([
+            $collection = FontCollection::create([
                 'name' => $request->input('name'),
                 'description' => $request->input('description'),
             ]);
