@@ -51,6 +51,141 @@
 - After significant JS changes, confirm events/actions align with patterns in `catalog.js` and leverage Boui logging helpers from the instructions to debug during development.【F:resources/js/catalog.js†L5-L63】【F:.github/instructions/backoffice-ui-boui.instructions.md†L14-L55】
 - For automation-heavy updates (commands, external builds), replicate the process-driven structure used in `BuildExternalDependenciesConsole` and surface options/flags for idempotency.【F:src/Console/BuildExternalDependenciesConsole.php†L15-L70】
 
-## Additional resources for contributors
-- Use the Makefile quickstart commands in the README for local setup and troubleshooting tips (ports, Vite allow-list, credentials).【F:README.md†L34-L139】
-- Explore the uxmaltech Backoffice UI package (linked in composer repositories) for additional fluent builders and examples when extending UI modules.【F:composer.json†L46-L69】
+
+## Estándares de documentación
+
+### 1) PHPDoc (archivo, clase, constantes, propiedades, métodos)
+
+- Describir **qué hace**, **por qué**, y **cómo se usa**.
+- Incluir `@package`, `@param`, `@return`, `@throws`, `@template` cuando aplique.
+- Documentar **complejidad, side-effects** y **posibles riesgos** (p. ej., N+1 queries).
+- Ejemplo rápido:
+
+```php
+<?php
+/**
+ * Query class for retrieving early access movies.
+ *
+ * Provides endpoint for fetching movies that are available for early access,
+ * with authentication required via Sanctum middleware.
+ *
+ * @package Anystream\Movies\Queries
+ */
+
+namespace App\Domains\Anystream\Movies\Queries;
+
+use App\Domains\Anystream\V1\Resources\MovieShortResource;
+use App\Domains\Core\Queries\BaseQuery;
+use App\Exceptions\AnystreamServerException;
+use App\Models\MovieContent;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
+use Uxmal\Backend\Attributes\RegisterQuery;
+
+#[RegisterQuery('/v1/anystream/movies/early-access', name: 'qry.anystream.movies.early-access.v1', middleware: ['auth:sanctum'])]
+class EarlyAccess extends BaseQuery
+{
+    /** Query name constant for tracking/logging purposes. */
+    const QUERY_NAME = 'qry.anystream.movies.early-access.v1';
+
+    /** Resource class used for data transformation. */
+    const RESOURCE = MovieShortResource::class;
+
+    /** Metadata for consistent pagination responses. */
+    const META = [
+        'collection' => 'Early Access',
+        'type' => 'movie-short',
+        'description' => 'Fetches a list of movies available for early access to authenticated users.',
+    ];
+
+    /**
+     * Retrieve early access movies for authenticated users.
+     *
+     * Fetches a curated list of movies available for early access,
+     * including metadata like ratings, covers, and streaming links.
+     * Uses eager loading to prevent N+1 query issues.
+     *
+     * @param  Request  $request  The HTTP request instance
+     * @return JsonResponse Collection of early access movies
+     *
+     * @throws AnystreamServerException When movie fetching fails
+     */
+    #[OA\Get(
+        path: '/v1/anystream/movies/early-access',
+        description: 'Retrieves a list of movies available for early access to authenticated users',
+        summary: 'Get early access movies',
+        security: [['sanctum' => []]],
+        tags: ['Movies', 'Early Access'],
+        parameters: [
+            new OA\Parameter(ref: '#/components/parameters/PageParameter'),
+            new OA\Parameter(ref: '#/components/parameters/PerPageParameter'),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Successful retrieval of early access movies',
+                content: new OA\JsonContent(ref: '#/components/schemas/MovieShortReel')
+            ),
+            new OA\Response(
+                response: 500,
+                description: 'Server error while fetching content',
+                content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')
+            ),
+        ]
+    )]
+    public function __invoke(Request $request): JsonResponse
+    {
+        try {
+            $this->setQuery(MovieContent::query()
+                ->select(['id', 'rating', 'title', 'published_date', 'multimedia_group_id'])
+                ->where('published', 'yes')
+                ->whereHas('multimediaGroup', fn ($q) => $q->where('type', 'moviecontent'))
+                ->with([
+                    'multimediaGroup:id,uuid',
+                    'images' => fn ($q) => $q->select(['id', 'type', 'type_id', 'category_type', 'default', 'url'])
+                        ->where('type', 'movies')
+                        ->whereIn('category_type', ['poster', 'backdrop'])
+                        ->where('default', 'yes'),
+                    'translations' => fn ($q) => $q->select(['id', 'foreignkey_id', 'locale', 'field', 'content'])
+                        ->where('locale', 'spa')
+                        ->where('field', 'title'),
+                    'movieGenres:id,name',
+                ])
+                ->orderByDesc('published_date')
+            );
+
+            return response()->json($this->buildResponse());
+
+        } catch (AnystreamServerException $e) {
+            throw new AnystreamServerException($e->getMessage(), $e->getCode());
+        }
+    }
+}
+```
+
+### 2) OpenAPI con OpenApi\Attributes
+
+**Schemas centralizados**: Usar SOLO `app/Domains/Anystream/V1/Schemas/` para definir `#[OA\Schema]`.
+
+**Referencias**: Usar `ref: '#/components/schemas/...'` para referenciar esquemas.
+
+**Ejemplos**: Incluir `example` y `description` en propiedades scalar y objetos.
+
+**Esquemas reusables**: Definir paginación estándar, errores y metadatos como componentes reutilizables.
+
+---
+
+## Resources y transformación de datos
+
+### Interface obligatoria
+
+Todos los Resources DEBEN implementar `ResourceInterface`:
+
+```php
+interface ResourceInterface
+{
+    public static function fromModel(Model $model, string $lang = 'es'): static;
+    public function toArray(): array;
+}
+```
